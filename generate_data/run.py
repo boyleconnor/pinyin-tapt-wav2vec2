@@ -1,12 +1,11 @@
+import re
+import zhon.hanzi
 from g2pM import G2pM
 
 
 NON_CHINESE_CHAR = '[NON_CHINESE]'
-# FIXME: Install real constants for the following two:
-CHINESE_CHARS = {'下', '丝', '书', '了', '京', '他', '你', '刚', '北', '去', '友',
-                 '吗', '店', '很', '我', '才', '是', '朋', '的', '离', '粉', '课',
-                 '过', '这', '远', '里'}
-CHINESE_PUNCS = {'。', '？'}
+CHINESE_PATTERN = \
+    '[{}{}]'.format(zhon.hanzi.characters, zhon.hanzi.punctuation)
 
 
 g2pm = G2pM()
@@ -27,10 +26,9 @@ def to_pinyin(line: str) -> (list[str], list[str]):
 
     # Create pre-processed output characters
     for character in line:
-        if character in (CHINESE_CHARS | CHINESE_PUNCS) \
-                and len(non_chinese) == 0:
+        if re.match(CHINESE_PATTERN, character) and len(non_chinese) == 0:
             output_chars.append(character)
-        elif character in (CHINESE_CHARS | CHINESE_PUNCS):
+        elif re.match(CHINESE_PATTERN, character):
             # De-queue the stored non-Chinese text section
             output_chars.append(NON_CHINESE_CHAR)
             non_chinese = []
