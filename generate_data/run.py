@@ -35,6 +35,8 @@ def to_pinyin(line: str) -> (list[str], list[str]):
             output_chars.append(character)
         else:
             non_chinese.append(character)
+    if len(non_chinese) > 0:
+        output_chars.append(NON_CHINESE_CHAR)
 
     # Convert output characters to pinyin
     # TODO: Should we split into phonetic parts at this point?
