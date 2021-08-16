@@ -32,6 +32,7 @@ def to_pinyin(line: str) -> (list[str], list[str]):
             # De-queue the stored non-Chinese text section
             output_chars.append(NON_CHINESE_CHAR)
             non_chinese = []
+            output_chars.append(character)
         else:
             non_chinese.append(character)
 
