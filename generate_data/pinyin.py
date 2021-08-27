@@ -44,24 +44,3 @@ def to_pinyin(line: str) -> (list[str], list[str]):
     output_pinyin = [] if len(output_chars) == 0 else g2pm(output_chars)
 
     return output_chars, output_pinyin
-
-
-def run():
-    """Download common crawl if not already downloaded, then convert to pinyin
-
-    generate pinyinized file thereof.
-    :return:
-    """
-    # TODO: implement download section
-
-    with open('generate_data/example_chinese.txt') as data_file:
-        for line in data_file:
-            chars, pinyin = to_pinyin(line)
-            print(f"original:\n{line}")
-            print(f"pre-proc'd chars:\n{chars}")
-            print(f"pinyin:\n{pinyin}")
-            print("")
-
-
-if __name__ == '__main__':
-    run()
