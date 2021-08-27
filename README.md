@@ -41,6 +41,19 @@ Original paper for XLSR-Wav2Vec2:
 }
 ```
 
+Paper for CLUECorpus:
+
+```bibtex
+@misc{xu2020cluecorpus2020,
+      title={CLUECorpus2020: A Large-scale Chinese Corpus for Pre-training Language Model}, 
+      author={Liang Xu and Xuanwei Zhang and Qianqian Dong},
+      year={2020},
+      eprint={2003.01355},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+```
+
 Paper for G2pM:
 
 ```bibtex
