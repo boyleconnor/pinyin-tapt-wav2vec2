@@ -1,4 +1,5 @@
 import re
+from typing import List
 import zhon.hanzi
 from g2pM import G2pM
 
@@ -11,7 +12,7 @@ CHINESE_PATTERN = \
 g2pm = G2pM()
 
 
-def to_pinyin(line: str) -> (list[str], list[str]):
+def to_pinyin(line: str) -> (List[str], List[str]):
     """Convert single line of Chinese characters (incl. other writing systems)
     to tokenized sequences of Chinese characters and pinyin.
 
