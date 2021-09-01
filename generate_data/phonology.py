@@ -1,6 +1,7 @@
 import re
 from typing import List
 import zhon.hanzi
+from dragonmapper.transcriptions import pinyin_to_ipa
 from g2pM import G2pM
 
 
@@ -12,7 +13,25 @@ CHINESE_PATTERN = \
 g2pm = G2pM()
 
 
-def to_pinyin(line: str) -> (List[str], List[str]):
+def pinyin_to_phonemes(syllable: str) -> str:
+    """Convert syllable of pinyin to phonemes (e.g. 'qu4' -> 'tɕʰy4')
+    """
+    # Extract tone (keep as number)
+    tone = syllable[-1]
+
+    # These special cases make up for a bug in dragonmapper, which should be
+    # addressed in PR #31.
+    if syllable[:-1] == 'yong':
+        phonemes = 'jʊŋ'
+    elif syllable[:-1] == 'you':
+        phonemes = 'joʊ'
+    else:
+        # The .replace() fixes a point of disagreement
+        phonemes = pinyin_to_ipa(syllable[:-1]).replace('œ', 'ɛ')
+    return phonemes + tone
+
+
+def chars_to_phonemes(line: str) -> (List[str], List[str]):
     """Convert single line of Chinese characters (incl. other writing systems)
     to tokenized sequences of Chinese characters and pinyin.
 
@@ -40,8 +59,16 @@ def to_pinyin(line: str) -> (List[str], List[str]):
         output_chars.append(NON_CHINESE_CHAR)
 
     # Convert output characters to pinyin
-    # TODO: Should we split into phonetic parts at this point?
-
     output_pinyin = [] if len(output_chars) == 0 else g2pm(output_chars)
 
-    return output_chars, output_pinyin
+    # Convert pinyin to phonemes
+    output_phonemes = []
+    for syllable in output_pinyin:
+        if syllable != NON_CHINESE_CHAR and not \
+                re.match(CHINESE_PATTERN, syllable):
+            phonemes = pinyin_to_phonemes(syllable)
+            output_phonemes.extend(phonemes)
+        else:
+            output_phonemes.append(syllable)
+
+    return output_chars, output_phonemes

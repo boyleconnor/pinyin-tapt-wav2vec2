@@ -1,1 +1,1 @@
-from . import pinyin
+from . import phonology
