@@ -25,6 +25,10 @@ def pinyin_to_phonemes(syllable: str) -> str:
         phonemes = 'jʊŋ'
     elif syllable[:-1] == 'you':
         phonemes = 'joʊ'
+    elif syllable[:-1] == 'o':
+        phonemes = 'ɔ'
+    elif syllable[:-1] == 'yo':
+        phonemes = 'jɔ'
     else:
         # The .replace() fixes a point of disagreement
         phonemes = pinyin_to_ipa(syllable[:-1]).replace('œ', 'ɛ')
@@ -66,7 +70,7 @@ def chars_to_phonemes(line: str) -> (List[str], List[str]):
     for syllable in output_pinyin:
         if syllable != NON_CHINESE_CHAR and not \
                 re.match(CHINESE_PATTERN, syllable):
-            phonemes = pinyin_to_phonemes(syllable)
+            phonemes = pinyin_to_phonemes(syllable.replace('u:', 'ü'))
             output_phonemes.extend(phonemes)
         else:
             output_phonemes.append(syllable)
