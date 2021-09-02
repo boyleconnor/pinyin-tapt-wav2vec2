@@ -1,5 +1,5 @@
 import pytest
-from generate_data.phonology import chars_to_phonemes
+from data.phonology import chars_to_phonemes
 
 
 CHINESE_SENTENCES = [
