@@ -5,6 +5,7 @@ from torchtext.vocab import vocab, Vocab, build_vocab_from_iterator
 from data.phonology import chars_to_phonemes, NON_CHINESE_CHAR, UNKNOWN_PINYIN
 from dragonmapper.transcriptions import _IPA_CHARACTERS
 
+
 UNK_TOKEN = '<UNK>'
 
 
