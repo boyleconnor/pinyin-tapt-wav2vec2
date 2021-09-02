@@ -1,11 +1,12 @@
 import re
-from typing import List
+from typing import List, Union
 import zhon.hanzi
 from dragonmapper.transcriptions import pinyin_to_ipa
 from g2pM import G2pM
 
 
 NON_CHINESE_CHAR = '[NON_CHINESE]'
+UNKNOWN_PINYIN = '[UNKNOWN_PINYIN]'
 CHINESE_PATTERN = \
     '[{}{}]'.format(zhon.hanzi.characters, zhon.hanzi.punctuation)
 
@@ -13,7 +14,7 @@ CHINESE_PATTERN = \
 g2pm = G2pM()
 
 
-def pinyin_to_phonemes(syllable: str) -> str:
+def pinyin_to_phonemes(syllable: str) -> Union[str, None]:
     """Convert syllable of pinyin to phonemes (e.g. 'qu4' -> 'tɕʰy4')
     """
     # Extract tone (keep as number)
@@ -31,7 +32,10 @@ def pinyin_to_phonemes(syllable: str) -> str:
         phonemes = 'jɔ'
     else:
         # The .replace() fixes a point of disagreement
-        phonemes = pinyin_to_ipa(syllable[:-1]).replace('œ', 'ɛ')
+        try:
+            phonemes = pinyin_to_ipa(syllable[:-1]).replace('œ', 'ɛ')
+        except ValueError:
+            return None
     return phonemes + tone
 
 
@@ -71,7 +75,10 @@ def chars_to_phonemes(line: str) -> (List[str], List[str]):
         if syllable != NON_CHINESE_CHAR and not \
                 re.match(CHINESE_PATTERN, syllable):
             phonemes = pinyin_to_phonemes(syllable.replace('u:', 'ü'))
-            output_phonemes.extend(phonemes)
+            if phonemes is not None:
+                output_phonemes.extend(phonemes)
+            else:
+                output_phonemes.append(UNKNOWN_PINYIN)
         else:
             output_phonemes.append(syllable)
 
