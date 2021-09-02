@@ -2,9 +2,8 @@ from collections import defaultdict, OrderedDict
 from typing import TextIO
 from tqdm import tqdm
 from torchtext.vocab import vocab, Vocab, build_vocab_from_iterator
-from data.phonology import chars_to_phonemes, NON_CHINESE_CHAR
+from data.phonology import chars_to_phonemes, NON_CHINESE_CHAR, UNKNOWN_PINYIN
 from dragonmapper.transcriptions import _IPA_CHARACTERS
-
 
 UNK_TOKEN = '<UNK>'
 
@@ -42,7 +41,7 @@ def get_phoneme_vocab() -> Vocab:
     '''
     all_ipa = list(_IPA_CHARACTERS.lower())
     all_chars = all_ipa + [NON_CHINESE_CHAR]
-    phoneme_vocab = build_vocab_from_iterator(all_chars, specials=[UNK_TOKEN])
+    phoneme_vocab = build_vocab_from_iterator(
+        all_chars, specials=[UNK_TOKEN, UNKNOWN_PINYIN])
     phoneme_vocab.set_default_index(phoneme_vocab[UNK_TOKEN])
     return phoneme_vocab
-
