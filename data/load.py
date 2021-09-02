@@ -1,7 +1,12 @@
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from typing import TextIO
 from tqdm import tqdm
-from data.phonology import chars_to_phonemes
+from torchtext.vocab import vocab, Vocab, build_vocab_from_iterator
+from data.phonology import chars_to_phonemes, NON_CHINESE_CHAR, UNKNOWN_PINYIN
+from dragonmapper.transcriptions import _IPA_CHARACTERS
+
+
+UNK_TOKEN = '<UNK>'
 
 
 def load_file(input_file):
@@ -14,21 +19,30 @@ def load_file(input_file):
         yield chars_to_phonemes(line)
 
 
-def generate_vocabularies(input_file: TextIO, min_char_freq: int = 2,
-                          min_phoneme_freq: int = 2):
+def generate_char_vocab(input_file: TextIO, min_freq: int = 2) -> Vocab:
     '''Given an input_file, generate two sets of unique units
     '''
-    char_counts, phoneme_counts = defaultdict(int), defaultdict(int)
+    char_counts, _ = defaultdict(int), defaultdict(int)
     for char_sequence, phoneme_sequence in load_file(input_file):
         for char in char_sequence:
             char_counts[char] += 1
-        for phoneme in phoneme_sequence:
-            phoneme_counts[phoneme] += 1
-    char_counts, phoneme_counts = dict(char_counts), dict(phoneme_counts)
 
-    chars = sorted(filter(lambda c: char_counts[c] >= min_char_freq,
-                          char_counts.keys()))
-    phonemes = sorted(filter(lambda p: phoneme_counts[p] >= min_phoneme_freq,
-                             phoneme_counts.keys()))
+    # Create character vocab, with OOV token
+    char_counts = OrderedDict(
+        sorted(char_counts.items(), key=lambda x: x[1], reverse=True))
+    char_vocab = vocab(char_counts, min_freq=min_freq)
+    char_vocab.insert_token(UNK_TOKEN, 0)
+    char_vocab.set_default_index(char_vocab[UNK_TOKEN])
 
-    return chars, phonemes
+    return char_vocab
+
+
+def get_phoneme_vocab() -> Vocab:
+    '''Create a vocabulary for the `phonemes` form of sentences
+    '''
+    all_ipa = list(_IPA_CHARACTERS.lower())
+    all_chars = all_ipa + [NON_CHINESE_CHAR]
+    phoneme_vocab = build_vocab_from_iterator(
+        all_chars, specials=[UNK_TOKEN, UNKNOWN_PINYIN])
+    phoneme_vocab.set_default_index(phoneme_vocab[UNK_TOKEN])
+    return phoneme_vocab
